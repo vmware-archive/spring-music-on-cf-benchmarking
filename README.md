@@ -1,4 +1,4 @@
-Spring Music on CF Benchmarking
+# Spring Music on CF Benchmarking
 
 Using [spring-music](https://github.com/cloudfoundry-samples/spring-music) as a sample application for benchmarking application performance on CF and Linux deployments.
 
