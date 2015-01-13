@@ -1,0 +1,106 @@
+---
+name: not-cf
+director_uuid: [REDACTED]
+releases:
+- name: cf
+  version: 183
+- name: bosh-warden-cpi
+  version: 9
+networks:
+- name: default
+  subnets:
+  - range: 10.85.22.0/24
+    gateway: 10.85.22.1
+    dns:
+    - 10.85.22.91
+    - 10.80.130.1
+    static:
+    - 10.85.22.254
+    - 10.85.22.92
+    - 10.85.22.93
+    - 10.85.22.95
+    - 10.85.22.96
+    - 10.85.22.100
+    - 10.85.22.101
+    - 10.85.22.104
+    - 10.85.22.105
+    - 10.85.22.107
+    - 10.85.22.108
+    - 10.85.22.99
+    - 10.85.22.106
+    - 10.85.22.102
+    - 10.85.22.125
+    - 10.85.22.124
+    - 10.85.22.126
+    - 10.85.22.98
+    - 10.85.22.123
+    - 10.85.22.97
+    - 10.85.22.94
+    reserved:
+    - 10.85.22.2-10.85.22.91
+    - 10.85.22.127-10.85.22.253
+    cloud_properties:
+      name: elephant
+resource_pools:
+- name: dea-partition-default_az_guid
+  stemcell:
+    name: bosh-vsphere-esxi-ubuntu-trusty-go_agent
+    version: '2682.2'
+  network: default
+  size: 1
+  cloud_properties:
+    ram: 2048
+    disk: 32768
+    cpu: 2
+    datacenters:
+    - clusters:
+      - private:
+          resource_pool: elephant
+  env:
+    bosh:
+      password: "[REDACTED]"
+compilation:
+  workers: 4
+  network: default
+  cloud_properties:
+    ram: 1024
+    disk: 6144
+    cpu: 2
+update:
+  canaries: 1
+  canary_watch_time: 30000-300000
+  update_watch_time: 30000-300000
+  max_in_flight: 1
+  max_errors: 2
+jobs:
+- name: machine
+  template:
+  - cpi
+  release: bosh-warden-cpi
+  lifecycle: service
+  instances: 1
+  resource_pool: dea-partition-default_az_guid
+  persistent_disk: 0
+  networks:
+  - name: default
+    default:
+    - dns
+    - gateway
+  update:
+    max_in_flight: 1
+properties:
+  # cpi job template
+  cpi:
+    host_ip: 10.254.50.4
+    warden:
+      connect_network: tcp
+      connect_address: 127.0.0.1:7777
+    agent:
+      mbus: nats://nats:nats-password@10.254.50.4:4222
+      blobstore:
+        provider: dav
+        options:
+          endpoint: http://10.254.50.4:25251
+          user: agent
+          password: agent-password
+    
